@@ -184,10 +184,10 @@ jobs:
       - name: Test URL
         env:
           #URL: ${{ needs.dev_deploy.outputs.SVC_URL }}
-          NO: ${{ needs.dev_deploy.outputs.application-url }}
+          PORT: ${{ needs.dev_deploy.outputs.application-url }}
         run: | 
-          echo $NO
-          curl  http://52.33.235.37:$NO/live  -s -k | jq -r .status | grep -i live 
+          echo $PORT
+          curl  http://52.33.235.37:$PORT/live  -s -k | jq -r .status | grep -i live 
 
   prod_deploy: 
     if: github.ref == 'refs/heads/main'

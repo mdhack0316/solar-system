@@ -31,7 +31,7 @@ jobs:
     resue-deploy:
       environment:
         name: ${{ inputs.environment }}
-        url:  http://52.33.235.37:$PORT/live
+        url:  http://52.33.235.37:$PORT
       outputs: 
         #SVC_URL: ${{ steps.myservice.outputs.ACTUAL_URL }}
         PORTS: ${{ steps.myservice.outputs.PORT }}
