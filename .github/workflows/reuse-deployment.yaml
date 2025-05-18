@@ -2,6 +2,22 @@ name: Reuse workflow
 
 on: 
     workflow_call:
+      inputs:
+        mongo-uri:
+          type: string
+          required: true
+        environment:
+          required: true
+          default: dev
+          type: string
+        k8s-manifest-dir:
+          required: true
+          default: kubernetes/
+          type: string
+        kubectl-version:
+          required: false
+          default:  'v1.30.0'
+          type: string 
       secrets: 
         k8s-kubeconfig: 
           required: true
@@ -11,7 +27,7 @@ on:
 jobs:
     resue-deploy:
       environment:
-        name: development
+        name: ${{ inputs.environment }}
         url:  http://52.33.235.37:$PORT/live
       outputs: 
         #SVC_URL: ${{ steps.myservice.outputs.ACTUAL_URL }}
@@ -24,7 +40,7 @@ jobs:
       - name: Using Action to iNstall Kubectl
         uses: azure/setup-kubectl@v4
         with:
-           version: 'v1.30.0'
+           version: '${{ inputs.kubectl-version }}'
       
       - name: Login using Kubeconfig File 
         uses: azure/k8s-set-context@v4
@@ -48,7 +64,7 @@ jobs:
         with: 
           tokenPrefix: '_{_' 
           tokenSuffix: '_}_' 
-          files: '["kubernetes/development/*.yaml"]' 
+          files: '["${{ inputs.k8s-manifest-dir }}*.yaml"]' 
         env: 
           NAMESPACE: ${{ vars.NAMESPACE }}
           REPLICAS: ${{ vars.REPLICAS }}
@@ -58,19 +74,19 @@ jobs:
       - name: Printing YAML
         continue-on-error: true
         run: |
-          cat kubernetes/development/*.yaml
+          cat ${{ inputs.k8s-manifest-dir }}*.yaml
 
       - name: Creating A secret becuase pod needs it 
         continue-on-error: true
         run: | 
           kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
-          --from-literal=MONGO_URI=${{ env.MONGO_URI }} \
+          --from-literal=MONGO_URI=${{ inputs.mongo-uri }} \
           --from-literal=MONGO_USERNAME=${{ vars.MONGO_USERNAME }} \
           --from-literal=MONGO_PASSWORD=${{ secrets.mongodb-pass }} 
 
       - name: Deploying app 
         run: |
-          kubectl apply -f kubernetes/development/
+          kubectl apply -f ${{ inputs.k8s-manifest-dir }}
       
       - name: retriving the url of service with nodeport
         id: myservice
