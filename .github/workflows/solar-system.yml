@@ -105,7 +105,7 @@ jobs:
       - name: Saving the artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Coverage Result
+          name: Coverage-Result
           path: coverage
           retention-days: 1
 
@@ -117,14 +117,14 @@ jobs:
     continue-on-error: true
     steps:
       - name: Download Mocha Test Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: Mocha-test-results
 
       - name: Download Code Coverage Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: Coverage Result
+          name: Coverage-Result
 
       - name: Merge Test Files
         run: |
