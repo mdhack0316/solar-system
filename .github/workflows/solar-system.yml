@@ -62,8 +62,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with: 
-          #name: Mocha-test-results
-          name: Numberwise- ${{ matrix.nodejs_version }} on ${{ matrix.os }}
+          name: Mocha-test-results
+          #name: Numberwise- ${{ matrix.nodejs_version }} on ${{ matrix.os }}
           path: test-results.xml
 
   code-coverage: 
@@ -108,6 +108,31 @@ jobs:
           name: Coverage Result
           path: coverage
           retention-days: 1
+
+
+  reports-s3:
+    needs: [code-coverage, unit-testing]
+    name: AWS S3 - Upload Reports
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Download Mocha Test Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Mocha-test-results
+
+      - name: Download Code Coverage Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Coverage Result
+
+      - name: Merge Test Files
+        run: |
+          ls -ltr
+          mkdir reports-${{ github.sha }}
+          mv cobertura-coverage.xml reports-${{ github.sha }}/
+          mv test-results.xml reports-${{ github.sha }}/
+          ls -ltr reports-${{ github.sha }}/
 
   docker: 
     name: Containerizatio
@@ -163,6 +188,8 @@ jobs:
           tags: |  
             ${{ vars.HUB_USERNAME }}/solar-system:${{ github.sha }}
             ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
+
+
   dev_deploy: 
     if: contains(github.ref, 'feature/')
     needs: docker
