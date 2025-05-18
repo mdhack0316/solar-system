@@ -23,6 +23,9 @@ on:
           required: true
         mongodb-pass: 
           required: true
+      outputs:
+        application-url: 
+          value: ${{ jobs.reuse-deploy.outputs.PORT }}
 
 jobs:
     resue-deploy:
