@@ -135,6 +135,7 @@ jobs:
           ls -ltr reports-${{ github.sha }}/
 
       - name: Upload to AWS S3
+        continue-on-error: true
         uses: jakejarvis/s3-sync-action@master
         with:
           args:  --follow-symlinks --delete
