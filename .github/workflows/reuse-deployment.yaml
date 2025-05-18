@@ -25,16 +25,16 @@ on:
           required: true
       outputs:
         application-url: 
-          value: ${{ jobs.reuse-deploy.outputs.PORTS }}
+          value: ${{ jobs.reuse-deploy.outputs.PORT }}
 
 jobs:
     resue-deploy:
       environment:
         name: ${{ inputs.environment }}
-        url:  http://52.33.235.37:${{ steps.myservice,outputs.PORT }}
+        url:  http://52.33.235.37:${{ steps.myservice.outputs.PORT }}
       outputs: 
         #SVC_URL: ${{ steps.myservice.outputs.ACTUAL_URL }}
-        PORTS: ${{ steps.myservice.outputs.PORT }}
+        PORT: ${{ steps.myservice.outputs.PORT }}
       runs-on: ubuntu-latest
       steps: 
       - name: Checkout repo
