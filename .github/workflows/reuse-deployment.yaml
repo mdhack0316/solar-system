@@ -2,6 +2,11 @@ name: Reuse workflow
 
 on: 
     workflow_call:
+      secrets: 
+        k8s-kubeconfig: 
+          required: true
+        mongodb-pass: 
+          required: true
 
 jobs:
     resue-deploy:
@@ -25,7 +30,7 @@ jobs:
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
-          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          kubeconfig: "${{ secrets.k8s-kubeconfig }}"
           context: kubernetes-admin@kubernetes
 
       - name: Fetch Kubernetes Cluster Details
@@ -61,7 +66,7 @@ jobs:
           kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
           --from-literal=MONGO_URI=${{ env.MONGO_URI }} \
           --from-literal=MONGO_USERNAME=${{ vars.MONGO_USERNAME }} \
-          --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} 
+          --from-literal=MONGO_PASSWORD=${{ secrets.mongodb-pass }} 
 
       - name: Deploying app 
         run: |
