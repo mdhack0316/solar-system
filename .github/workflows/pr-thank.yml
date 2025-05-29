@@ -1,0 +1,23 @@
+on:
+  pull_request: 
+        types:
+         - opened
+
+jobs:
+  pr-action:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - name: Post PR Comment
+      uses: mdhack0316/docker-giphy-pr-custom-action@main
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        giphy-api-key: ${{ secrets.GIPHY_API_KEY }}
+
+    - name: Post PR Comment using JS 
+      uses: mdhack0316/js-action-pr-giphy-comment@1.0.0-alpha
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        giphy-api-key: ${{ secrets.GIPHY_API_KEY }}
