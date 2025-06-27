@@ -282,7 +282,7 @@ jobs:
       with:
         method: kubeconfig
         kubeconfig: "${{ secrets.KUBECONFIG }}"
-        context: kubernetes-admin@kubernetes
+        context: eyaks
 
     - name: Fetch Kubernetes Cluster Details
       run: | 
@@ -299,7 +299,7 @@ jobs:
       with: 
         tokenPrefix: '_{_' 
         tokenSuffix: '_}_' 
-        files: '["kubernetes/development/*.yaml"]' 
+        files: '["kubernetes/production/*.yaml"]' 
       env: 
         NAMESPACE: ${{ vars.NAMESPACE }}
         REPLICAS: ${{ vars.REPLICAS }}
@@ -309,7 +309,7 @@ jobs:
     - name: Printing YAML
       continue-on-error: true
       run: |
-        cat kubernetes/development/*.yaml
+        cat kubernetes/production/*.yaml
 
     - name: Creating A secret becuase pod needs it 
       continue-on-error: true
@@ -328,7 +328,7 @@ jobs:
       run: | 
         #echo "ACTUAL_URL=$(curl -s ifconfig.me ):$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')" >>  $GITHUB_OUTPUT
         #echo "PORT=$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')"  >> $GITHUB_OUTPUT
-        echo "PORT=$(kubectl get svc  solar-system -n mayank -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"  >> $GITHUB_OUTPUT
+        echo "PORT=$(kubectl get svc  solar-system -n production -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"  >> $GITHUB_OUTPUT
 
   prod-integration-testing:
     if: github.ref == 'refs/heads/main'
