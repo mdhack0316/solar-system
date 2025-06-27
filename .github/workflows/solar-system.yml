@@ -243,8 +243,9 @@ jobs:
         id: myservice
         run: | 
           #echo "ACTUAL_URL=$(curl -s ifconfig.me ):$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')" >>  $GITHUB_OUTPUT
-          echo "PORT=$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')"  >> $GITHUB_OUTPUT
-  integration-testing:
+          #echo "PORT=$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')"  >> $GITHUB_OUTPUT
+          #echo "IPs=$(kubectl get svc  pod -n mayank -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"  >> $GITHUB_OUTPUT
+    integration-testing:
     if: contains(github.ref, 'feature/')
     name: Dev Integration Testing
     needs: dev_deploy
@@ -263,10 +264,10 @@ jobs:
     needs: docker
     environment:
       name: development
-      url: http://52.33.235.37:${{ steps.myservice.outputs.PORT }}
+      url: http://${{ steps.myservice.outputs.IPs }}
     outputs: 
       #SVC_URL: ${{ steps.myservice.outputs.ACTUAL_URL }}
-      PORT: ${{ steps.myservice.outputs.PORT }}
+      IPs: ${{ steps.myservice.outputs.IPs }}
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout repo
@@ -327,7 +328,8 @@ jobs:
       id: myservice
       run: | 
         #echo "ACTUAL_URL=$(curl -s ifconfig.me ):$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')" >>  $GITHUB_OUTPUT
-        echo "PORT=$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')"  >> $GITHUB_OUTPUT
+        #echo "PORT=$(kubectl get svc  solar-system -n default -o jsonpath='{.spec.ports[0].nodePort}')"  >> $GITHUB_OUTPUT
+        echo "IPs=$(kubectl get svc  pod -n mayank -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"  >> $GITHUB_OUTPUT
 
 
   prod-integration-testing:
@@ -339,7 +341,7 @@ jobs:
       - name: Test URL
         env:
           #URL: ${{ needs.prod_deploy.outputs.SVC_URL }}
-          NO: ${{ needs.prod_deploy.outputs.PORT }}
+          NO: ${{ needs.prod_deploy.outputs.IPs }}
         run: | 
           echo $URL
-          curl  http://52.33.235.37:$NO/live  -s -k | jq -r .status | grep -i live 
+          curl  http://$NO/live  -s -k | jq -r .status | grep -i live 
